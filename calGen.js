@@ -95,17 +95,35 @@ var createEvent = function (r) {
 
   // Summary
   switch (r.component) {
-  	case "LEC":
-  		summary = r.courseCode + " - " + r.courseName;
-  		break;
-  	case "TST":
-  		summary = r.courseCode + " Midterm";
-  		break;
+    case "LEC":
+      summary = document.getElementById("lec_format").value;
+      break;
     case "TUT":
+      summary = document.getElementById("tut_format").value;
+      break;
     case "LAB":
-  	default:
-  		summary = r.courseCode + " " + r.component;
+      summary = document.getElementById("lab_format").value;
+      break;
+    case "TST":
+      summary = document.getElementById("tst_format").value;
   }
+  // console.log(r.component, summary);
+  if (summary === "") {
+    summary = document.getElementById("dft_format").value;
+  }
+  // Process substitutions
+  summary = summary.split("\\\\");
+  for (var i=0; i<summary.length; i++) {
+    var temp = summary[i];
+    temp = temp.replace(/([^\\]|^)%cc/g, "$1" + r.courseCode);
+    temp = temp.replace(/\\%cc/g, "%cc");
+    temp = temp.replace(/([^\\]|^)%cn/g, "$1" + r.courseName);
+    temp = temp.replace(/\\%cn/g, "%cn");
+    temp = temp.replace(/([^\\]|^)%comp/g, "$1" + r.component);
+    summary[i] = temp.replace(/\\%comp/g, "%comp");
+  }
+  summary = summary.join("\\");
+  console.log(summary);
 
   // Description
   desc = "Class Nbr: " + r.classNumber;
@@ -258,12 +276,12 @@ var generateICS = function () {
   document.getElementById("ics_content").value = output;
 
   // Exporting to file?
-  var aasdf = document.createElement("a");
-  var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});
-  aasdf.href = URL.createObjectURL(file);
-  aasdf.download = "asdf.ics";
-  document.body.appendChild(aasdf);
-  aasdf.click();
+  // var aasdf = document.createElement("a");
+  // var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});
+  // aasdf.href = URL.createObjectURL(file);
+  // aasdf.download = "asdf.ics";
+  // document.body.appendChild(aasdf);
+  // aasdf.click();
 
   var info = "The total number of events created was " + numEvents + ".";
 };
