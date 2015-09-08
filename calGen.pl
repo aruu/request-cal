@@ -23,7 +23,7 @@ my $numevents = 0;
 # Iterate through Quest text
 while (<$input_file>) {
   # Start of course info for one specific course
-  if (/(\w+ \d+) - ([\w\- ]+)/) {
+  if (/(\w+ \d+) - ([\w\-& ]+)/) {
     # Start of course components info block
     my %row = (
       course_code => $1,
