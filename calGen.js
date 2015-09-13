@@ -2,10 +2,16 @@ var uidCounter = 0;
 
 var readRow = function (row, arr) {
 	if (arr[0].match(/^\d{4}$/)) {
+    // New component
 		row.classNumber = arr.shift();
 		row.section = arr.shift();
 		row.component = arr.shift();
-	}
+	} else {
+    // Old component and these are blanks
+    arr.shift();
+    arr.shift();
+    arr.shift();
+  }
 	row.daysTimes = arr.shift();
 	row.room = arr.shift();
 	row.instructor = arr.shift();
@@ -106,9 +112,14 @@ var createEvent = function (r) {
       break;
     case "TST":
       summary = document.getElementById("tst_format").value;
+      break;
+    case "SEM":
+      summary = document.getElementById("sem_format").value;
+      break;
+    case "PRJ":
+      summary = document.getElementById("prj_format").value;
   }
-  // console.log(r.component, summary);
-  if (summary === "") {
+  if (summary === "" || summary === undefined) {
     summary = document.getElementById("dft_format").value;
   }
   // Process substitutions
@@ -123,7 +134,6 @@ var createEvent = function (r) {
     summary[i] = temp.replace(/\\%comp/g, "%comp");
   }
   summary = summary.join("\\");
-  console.log(summary);
 
   // Description
   desc = "Class Nbr: " + r.classNumber;
@@ -160,7 +170,7 @@ var createEvent = function (r) {
   // UID
   uid = dtstamp.replace(/[TZ]/g, "");
   uid += uidCounter;
-  uid += "\@aruu.github.com";
+  uid += "\@aruu.github.io";
   uidCounter++;
 
   // Sample VEVENT format
@@ -231,12 +241,13 @@ var generateICS = function () {
 	// Clean up input text
 	input = input.split("\n");
 	for (var i=input.length-1; i>=0; i--) {
-    if (/^\s*$/.exec(input[i])) input.splice(i,1);
+    if (/^\t*$/.exec(input[i])) input.splice(i,1);
   }
+  console.log(input);
 
 	// Iterate through Quest text
 	for (var i=0; i<input.length; i++) {
-		if (result = /(\w+ \d+\w*) - ([\w\-& ]+)/.exec(input[i])) {
+		if (result = /(\w+ \d+\w*) - ([\w\-&\. ]+)/.exec(input[i])) {
 			var row = {
 				courseCode: 	result[1],
 				courseName: 	result[2],
@@ -250,21 +261,18 @@ var generateICS = function () {
 			};
 
 			// Skip 6 lines to start of component data
-			i += 6;
+			i += 7;
+      if (!input[i].match(/^\d{4}$/)) i++;
 
 			// Entries in each row
 			while (input[i] !== "Exam Information") {
 				numEvents++;
-				if (/\d{4}/.exec(input[i])) {
-					// New component
-					row = readRow(row, input.slice(i,i+7));
-					i += 7;
-				} else {
-					// Same as previous component, additional parts
-					row = readRow(row, input.slice(i,i+4));
-					i += 4;
-				}
-				output += createEvent(row);
+				row = readRow(row, input.slice(i,i+7));
+				i += 7;
+        console.log(row.courseCode, row.component, row.daysTimes);
+				if (row.daysTimes !== "TBA" && row.daysTimes !== " ") {
+          output += createEvent(row);
+        }
 			}
 
 		}
@@ -276,12 +284,12 @@ var generateICS = function () {
   document.getElementById("ics_content").value = output;
 
   // Exporting to file?
-  // var aasdf = document.createElement("a");
-  // var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});
-  // aasdf.href = URL.createObjectURL(file);
-  // aasdf.download = "asdf.ics";
-  // document.body.appendChild(aasdf);
-  // aasdf.click();
+  var aasdf = document.createElement("a");
+  var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});
+  aasdf.href = URL.createObjectURL(file);
+  aasdf.download = "asdf.ics";
+  document.body.appendChild(aasdf);
+  aasdf.click();
 
   var info = "The total number of events created was " + numEvents + ".";
 };
