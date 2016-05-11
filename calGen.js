@@ -247,7 +247,7 @@ var generateICS = function () {
 
 	// Iterate through Quest text
 	for (var i=0; i<input.length; i++) {
-		if (result = /(\w+ \d+\w*) - ([\w\-&\. ]+)/.exec(input[i])) {
+		if (result = /(\w+ \d+\w*) - (.+$)/.exec(input[i])) {
 			var row = {
 				courseCode: 	result[1],
 				courseName: 	result[2],
