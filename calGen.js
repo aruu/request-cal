@@ -1,6 +1,74 @@
 var uidCounter = 0;
 
-var readRow = function (row, arr) {
+function generateICS() {
+  var input = document.getElementById("quest_content").value;
+
+  var output = "";
+
+  // ICS file header
+  output += "BEGIN:VCALENDAR\n";
+  output += "VERSION:2.0\n";
+  output += "PRODID:-//Kevin Thai//reQuestCal 1.0//EN\n";
+
+  var numEvents = 0;
+
+  // Clean up input text
+  input = input.split("\n");
+  for (var i=input.length-1; i>=0; i--) {
+    if (/^\t*$/.exec(input[i])) input.splice(i,1);
+  }
+  console.log(input);
+
+  // Iterate through Quest text
+  for (var i=0; i<input.length; i++) {
+    if (result = /(\w+ \d+\w*) - (.+$)/.exec(input[i])) {
+      var row = {
+        courseCode:   result[1],
+        courseName:   result[2],
+        classNumber:  "",
+        section:      "",
+        component:    "",
+        daysTimes:    "",
+        room:         "",
+        instructor:   "",
+        startEnd:     ""
+      };
+
+      // Skip 6 lines to start of component data
+      i += 7;
+      if (!input[i].match(/^\d{4}$/)) i++;
+
+      // Entries in each row
+      while (input[i] !== "Exam Information") {
+        numEvents++;
+        row = readRow(row, input.slice(i,i+7));
+        i += 7;
+        console.log(row.courseCode, row.component, row.daysTimes);
+        if (row.daysTimes !== "TBA" && row.daysTimes !== " ") {
+          output += createEvent(row);
+        }
+      }
+
+    }
+  }
+
+  // End ICS file
+  output += "END:VCALENDAR\n";
+
+  document.getElementById("ics_content").value = output;
+
+  // Exporting to file?
+  var aasdf = document.createElement("a");
+  var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});
+  aasdf.href = URL.createObjectURL(file);
+  aasdf.download = "asdf.ics";
+  document.body.appendChild(aasdf);
+  aasdf.click();
+
+  var info = "The total number of events created was " + numEvents + ".";
+};
+
+function readRow(row, arr) {
 	if (arr[0].match(/^\d{4}$/)) {
     // New component
 		row.classNumber = arr.shift();
@@ -19,84 +87,7 @@ var readRow = function (row, arr) {
 	return row;
 };
 
-var createRRule = function (daysTimes, startDate, endDate) {
-  var rrule = "FREQ=WEEKLY;UNTIL=" + endDate + "T235959Z;BYDAY=";
-
-  var daysChar = daysTimes.match(/\w+/)[0].match(/[MTWF]h?/g);
-  var i = 0;
-  if (daysChar[i] === "M") {
-    rrule += "MO,";
-    i++;
-  }
-  if (daysChar[i] === "T") {
-    rrule += "TU,";
-    i++;
-  }
-  if (daysChar[i] === "W") {
-    rrule += "WE,";
-    i++;
-  }
-  if (daysChar[i] === "Th") {
-    rrule += "TH,";
-    i++;
-  }
-  if (daysChar[i] === "F") {
-    rrule += "FR,";
-    i++;
-  }
-
-  return rrule.replace(/.$/,"");
-};
-
-var createDtBounds = function (daysTimes, startDate, endDate) {
-
-  if (startDate !== endDate) {
-    var daysChar = daysTimes.match(/\w+/)[0].match(/[MTWF]h?/g);
-    switch (daysChar[0]) {
-      case "T":
-        startDate = (parseInt(startDate) + 1).toString();
-        break;
-      case "W":
-        startDate = (parseInt(startDate) + 2).toString();
-        break;
-      case "Th":
-        startDate = (parseInt(startDate) + 3).toString();
-        break;
-      case "F":
-        startDate = (parseInt(startDate) + 4).toString();
-    }
-  }
-
-  var pattern = /(\d+):(\d+)(\w+)/g;
-  var aData = pattern.exec(daysTimes);
-  var bData = pattern.exec(daysTimes);
-  if (aData[3] === "PM" && aData[1] !== "12") {
-    aData[1] = (parseInt(aData[1]) + 12).toString();
-  }
-  if (aData[3] === "AM" && aData[1] === "12") {
-    aData[1] = "00";
-  }
-  if (bData[3] === "PM" && bData[1] !== "12") {
-    bData[1] = (parseInt(bData[1]) + 12).toString();
-  }
-  if (bData[3] === "AM" && bData[1] === "12") {
-    bData[1] = "00";
-  }
-  bData[2] = (parseInt(bData[2]) + 10).toString();
-  if (bData[2] === "60") {
-    bData[1] = (parseInt(bData[1]) + 1).toString();
-    bData[2] = "00";
-  }
-  
-  var a = aData[1] + aData[2] + "00";
-  for (var i=a.length; i<6; i++) a = "0" + a;
-  var b = bData[1] + bData[2] + "00";
-  for (var i=b.length; i<6; i++) b = "0" + b;
-
-  return [startDate+"T"+a, startDate+"T"+b];
-};
-
-var createEvent = function (r) {
+function createEvent(r) {
 	var summary, desc, location, dtstamp, dtstart, dtend, rrule, uid;
 
   // Summary
@@ -226,70 +217,79 @@ var createEvent = function (r) {
   return outputString;
 };
 
-var generateICS = function () {
-	var input = document.getElementById("quest_content").value;
+function createRRule(daysTimes, startDate, endDate) {
+  var rrule = "FREQ=WEEKLY;UNTIL=" + endDate + "T235959Z;BYDAY=";
 
-	var output = "";
-
-	// ICS file header
-	output += "BEGIN:VCALENDAR\n";
-	output += "VERSION:2.0\n";
-	output += "PRODID:-//Kevin Thai//reQuestCal 1.0//EN\n";
-
-	var numEvents = 0;
-
-	// Clean up input text
-	input = input.split("\n");
-	for (var i=input.length-1; i>=0; i--) {
-    if (/^\t*$/.exec(input[i])) input.splice(i,1);
+  var daysChar = daysTimes.match(/\w+/)[0].match(/[MTWF]h?/g);
+  var i = 0;
+  if (daysChar[i] === "M") {
+    rrule += "MO,";
+    i++;
   }
-  console.log(input);
+  if (daysChar[i] === "T") {
+    rrule += "TU,";
+    i++;
+  }
+  if (daysChar[i] === "W") {
+    rrule += "WE,";
+    i++;
+  }
+  if (daysChar[i] === "Th") {
+    rrule += "TH,";
+    i++;
+  }
+  if (daysChar[i] === "F") {
+    rrule += "FR,";
+    i++;
+  }
 
-	// Iterate through Quest text
-	for (var i=0; i<input.length; i++) {
-		if (result = /(\w+ \d+\w*) - (.+$)/.exec(input[i])) {
-			var row = {
-				courseCode: 	result[1],
-				courseName: 	result[2],
-				classNumber:	"",
-				section: 		 	"",
-				component: 	 	"",
-				daysTimes: 	 	"",
-				room: 				"",
-				instructor: 	"",
-				startEnd: 		""
-			};
+  return rrule.replace(/.$/,"");
+};
 
-			// Skip 6 lines to start of component data
-			i += 7;
-      if (!input[i].match(/^\d{4}$/)) i++;
+function createDtBounds(daysTimes, startDate, endDate) {
 
-			// Entries in each row
-			while (input[i] !== "Exam Information") {
-				numEvents++;
-				row = readRow(row, input.slice(i,i+7));
-				i += 7;
-        console.log(row.courseCode, row.component, row.daysTimes);
-				if (row.daysTimes !== "TBA" && row.daysTimes !== " ") {
-          output += createEvent(row);
-        }
-			}
+  if (startDate !== endDate) {
+    var daysChar = daysTimes.match(/\w+/)[0].match(/[MTWF]h?/g);
+    switch (daysChar[0]) {
+      case "T":
+        startDate = (parseInt(startDate) + 1).toString();
+        break;
+      case "W":
+        startDate = (parseInt(startDate) + 2).toString();
+        break;
+      case "Th":
+        startDate = (parseInt(startDate) + 3).toString();
+        break;
+      case "F":
+        startDate = (parseInt(startDate) + 4).toString();
+    }
+  }
 
-		}
-	}
+  var pattern = /(\d+):(\d+)(\w+)/g;
+  var aData = pattern.exec(daysTimes);
+  var bData = pattern.exec(daysTimes);
+  if (aData[3] === "PM" && aData[1] !== "12") {
+    aData[1] = (parseInt(aData[1]) + 12).toString();
+  }
+  if (aData[3] === "AM" && aData[1] === "12") {
+    aData[1] = "00";
+  }
+  if (bData[3] === "PM" && bData[1] !== "12") {
+    bData[1] = (parseInt(bData[1]) + 12).toString();
+  }
+  if (bData[3] === "AM" && bData[1] === "12") {
+    bData[1] = "00";
+  }
+  bData[2] = (parseInt(bData[2]) + 10).toString();
+  if (bData[2] === "60") {
+    bData[1] = (parseInt(bData[1]) + 1).toString();
+    bData[2] = "00";
+  }
+  
+  var a = aData[1] + aData[2] + "00";
+  for (var i=a.length; i<6; i++) a = "0" + a;
+  var b = bData[1] + bData[2] + "00";
+  for (var i=b.length; i<6; i++) b = "0" + b;
 
-	// End ICS file
-	output += "END:VCALENDAR\n";
-
-  document.getElementById("ics_content").value = output;
-
-  // Exporting to file?
-  var aasdf = document.createElement("a");
-  var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});
-  aasdf.href = URL.createObjectURL(file);
-  aasdf.download = "asdf.ics";
-  document.body.appendChild(aasdf);
-  aasdf.click();
-
-  var info = "The total number of events created was " + numEvents + ".";
+  return [startDate+"T"+a, startDate+"T"+b];
 };
