@@ -8,7 +8,7 @@ function generateICS() {
   // ICS file header
   output += "BEGIN:VCALENDAR\n";
   output += "VERSION:2.0\n";
-  output += "PRODID:-//Kevin Thai//reQuestCal 1.0//EN\n";
+  output += "PRODID:-//Kevin Thai//reQuestCal 1.5//EN\n";
 
   var numEvents = 0;
 
@@ -17,40 +17,51 @@ function generateICS() {
   for (var i=input.length-1; i>=0; i--) {
     if (/^\t*$/.exec(input[i])) input.splice(i,1);
   }
-  console.log(input);
+
+  var rows = [];
 
   // Iterate through Quest text
   for (var i=0; i<input.length; i++) {
-    if (result = /(\w+ \d+\w*) - (.+$)/.exec(input[i])) {
-      var row = {
-        courseCode:   result[1],
-        courseName:   result[2],
-        classNumber:  "",
-        section:      "",
-        component:    "",
-        daysTimes:    "",
-        room:         "",
-        instructor:   "",
-        startEnd:     ""
-      };
 
-      // Skip 6 lines to start of component data
-      i += 7;
-      if (!input[i].match(/^\d{4}$/)) i++;
+    if (result = /(\w+ \d+\w*) - ([\w\-&\. ]+)/.exec(input[i])) {
+      var row = {};
+      row["Course Code"] = result[1];
+      row["Course Name"] = result[2];
+      i++;
 
+      // Skip n lines; this corresponds to the first table, Course Info
+      i += input[i].split("\t").length + 1;
+
+      // Get column headings
+      var colNames = input[i].split("\t");
+      // Trim the headings for trailing spaces
+      for (var j=0; j<colNames.length; j++) colNames[j] = colNames[j].trim();
+      i++;
+
+      // Start of component data
       // Entries in each row
       while (input[i] !== "Exam Information") {
         numEvents++;
-        row = readRow(row, input.slice(i,i+7));
-        i += 7;
-        console.log(row.courseCode, row.component, row.daysTimes);
-        if (row.daysTimes !== "TBA" && row.daysTimes !== " ") {
-          output += createEvent(row);
-        }
+        row = readRow(row, input, i, colNames);
+        // var tempRow =  {};
+        // for (var key in row) tempRow[key] = row[key];
+        rows.push(row);
+        i += colNames.length;
       }
 
     }
+
   }
+  console.log(rows);
+  // processRows(rows);
+  // console.log(rows);
+  
+  // for (var i=0; i<rows.length; i++) {
+  //   console.log(rows[i]);
+  //   if (rows[i]["Days & Times"] !== undefined && rows[i]["Days & Times"] !== "TBA" && rows[i]["Days & Times"] !== " ") {
+  //     output += createEvent(rows[i]);
+  //   }
+  // }
 
   // End ICS file
   output += "END:VCALENDAR\n";
@@ -63,29 +74,21 @@ function generateICS() {
   aasdf.href = URL.createObjectURL(file);
   aasdf.download = "asdf.ics";
   document.body.appendChild(aasdf);
-  aasdf.click();
+  // aasdf.click();
 
   var info = "The total number of events created was " + numEvents + ".";
-};
+}
 
-function readRow(row, arr) {
-	if (arr[0].match(/^\d{4}$/)) {
-    // New component
-		row.classNumber = arr.shift();
-		row.section = arr.shift();
-		row.component = arr.shift();
-	} else {
-    // Old component and these are blanks
-    arr.shift();
-    arr.shift();
-    arr.shift();
+// Produce a struct with fields named with column headers
+function readRow(row, input, i, colNames) {
+  // we've already stripped out all lines that are just tab;
+  // every other space should be an empty cell
+  for (var j=0; j<colNames.length; j++) {
+    if (input[i+j].match(/^[\t\s]*$/)) continue;
+    row[colNames[j]] = input[i+j];
   }
-	row.daysTimes = arr.shift();
-	row.room = arr.shift();
-	row.instructor = arr.shift();
-	row.startEnd = arr.shift();
-	return row;
-};
+  return row;
+}
 
 function createEvent(r) {
 	var summary, desc, location, dtstamp, dtstart, dtend, rrule, uid;
@@ -93,22 +96,22 @@ function createEvent(r) {
   // Summary
   switch (r.component) {
     case "LEC":
-      summary = document.getElementById("lec_format").value;
-      break;
+    summary = document.getElementById("lec_format").value;
+    break;
     case "TUT":
-      summary = document.getElementById("tut_format").value;
-      break;
+    summary = document.getElementById("tut_format").value;
+    break;
     case "LAB":
-      summary = document.getElementById("lab_format").value;
-      break;
+    summary = document.getElementById("lab_format").value;
+    break;
     case "TST":
-      summary = document.getElementById("tst_format").value;
-      break;
+    summary = document.getElementById("tst_format").value;
+    break;
     case "SEM":
-      summary = document.getElementById("sem_format").value;
-      break;
+    summary = document.getElementById("sem_format").value;
+    break;
     case "PRJ":
-      summary = document.getElementById("prj_format").value;
+    summary = document.getElementById("prj_format").value;
   }
   if (summary === "" || summary === undefined) {
     summary = document.getElementById("dft_format").value;
@@ -215,7 +218,7 @@ function createEvent(r) {
   // outputString += "TRANSP:OPAQUE\n";
   outputString += "END:VEVENT\n";
   return outputString;
-};
+}
 
 function createRRule(daysTimes, startDate, endDate) {
   var rrule = "FREQ=WEEKLY;UNTIL=" + endDate + "T235959Z;BYDAY=";
@@ -244,7 +247,7 @@ function createRRule(daysTimes, startDate, endDate) {
   }
 
   return rrule.replace(/.$/,"");
-};
+}
 
 function createDtBounds(daysTimes, startDate, endDate) {
 
@@ -252,16 +255,16 @@ function createDtBounds(daysTimes, startDate, endDate) {
     var daysChar = daysTimes.match(/\w+/)[0].match(/[MTWF]h?/g);
     switch (daysChar[0]) {
       case "T":
-        startDate = (parseInt(startDate) + 1).toString();
-        break;
+      startDate = (parseInt(startDate) + 1).toString();
+      break;
       case "W":
-        startDate = (parseInt(startDate) + 2).toString();
-        break;
+      startDate = (parseInt(startDate) + 2).toString();
+      break;
       case "Th":
-        startDate = (parseInt(startDate) + 3).toString();
-        break;
+      startDate = (parseInt(startDate) + 3).toString();
+      break;
       case "F":
-        startDate = (parseInt(startDate) + 4).toString();
+      startDate = (parseInt(startDate) + 4).toString();
     }
   }
 
@@ -288,8 +291,8 @@ function createDtBounds(daysTimes, startDate, endDate) {
   
   var a = aData[1] + aData[2] + "00";
   for (var i=a.length; i<6; i++) a = "0" + a;
-  var b = bData[1] + bData[2] + "00";
+    var b = bData[1] + bData[2] + "00";
   for (var i=b.length; i<6; i++) b = "0" + b;
 
-  return [startDate+"T"+a, startDate+"T"+b];
-};
+    return [startDate+"T"+a, startDate+"T"+b];
+}
