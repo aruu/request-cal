@@ -43,8 +43,6 @@ function generateICS() {
       while (input[i] !== "Exam Information") {
         numEvents++;
         row = readRow(row, input, i, colNames);
-        // var tempRow =  {};
-        // for (var key in row) tempRow[key] = row[key];
         rows.push(row);
         i += colNames.length;
       }
@@ -52,10 +50,10 @@ function generateICS() {
     }
 
   }
+
+  // now we have the table information as they exist, with inferences
   console.log(rows);
-  // processRows(rows);
-  // console.log(rows);
-  
+
   // for (var i=0; i<rows.length; i++) {
   //   console.log(rows[i]);
   //   if (rows[i]["Days & Times"] !== undefined && rows[i]["Days & Times"] !== "TBA" && rows[i]["Days & Times"] !== " ") {
@@ -80,7 +78,11 @@ function generateICS() {
 }
 
 // Produce a struct with fields named with column headers
-function readRow(row, input, i, colNames) {
+function readRow(prevRow, input, i, colNames) {
+  // make a deep copy of the previous row struct to carry over inferred values
+  var row =  {};
+  for (var key in prevRow) row[key] = prevRow[key];
+    
   // we've already stripped out all lines that are just tab;
   // every other space should be an empty cell
   for (var j=0; j<colNames.length; j++) {
