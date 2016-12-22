@@ -68,11 +68,12 @@ function generateICS() {
   document.getElementById("ics_content").value = output;
 
   // Exporting to file?
-  // var aasdf = document.createElement("a");
-  var aasdf = document.getElementById("download_btn");
+  var aasdf = document.getElementById("download_a");
   var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});
   aasdf.href = URL.createObjectURL(file);
   aasdf.download = "asdf.ics";
+  var aasdf = document.getElementById("download_btn");
+  aasdf.removeAttribute("disabled");
 
   var info = "The total number of events created was " + numEvents + ".";
 }
