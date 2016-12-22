@@ -53,13 +53,14 @@ function generateICS() {
 
   // now we have the table information as they exist, with inferences
   console.log(rows);
+  // could merge the biweekly lab events into a recurring event here
 
-  // for (var i=0; i<rows.length; i++) {
-  //   console.log(rows[i]);
-  //   if (rows[i]["Days & Times"] !== undefined && rows[i]["Days & Times"] !== "TBA" && rows[i]["Days & Times"] !== " ") {
-  //     output += createEvent(rows[i]);
-  //   }
-  // }
+  for (var i=0; i<rows.length; i++) {
+    console.log(rows[i]);
+    if (rows[i]["Days & Times"] !== undefined && rows[i]["Days & Times"] !== "TBA" && rows[i]["Days & Times"] !== " ") {
+      output += createEvent(rows[i]);
+    }
+  }
 
   // End ICS file
   output += "END:VCALENDAR\n";
@@ -92,28 +93,28 @@ function readRow(prevRow, input, i, colNames) {
   return row;
 }
 
-function createEvent(r) {
+function createEvent(rItem) {
 	var summary, desc, location, dtstamp, dtstart, dtend, rrule, uid;
 
   // Summary
-  switch (r.component) {
+  switch (rItem["Component"]) {
     case "LEC":
-    summary = document.getElementById("lec_format").value;
-    break;
+      summary = document.getElementById("lec_format").value;
+      break;
     case "TUT":
-    summary = document.getElementById("tut_format").value;
-    break;
+      summary = document.getElementById("tut_format").value;
+      break;
     case "LAB":
-    summary = document.getElementById("lab_format").value;
-    break;
+      summary = document.getElementById("lab_format").value;
+      break;
     case "TST":
-    summary = document.getElementById("tst_format").value;
-    break;
+      summary = document.getElementById("tst_format").value;
+      break;
     case "SEM":
-    summary = document.getElementById("sem_format").value;
-    break;
+      summary = document.getElementById("sem_format").value;
+      break;
     case "PRJ":
-    summary = document.getElementById("prj_format").value;
+      summary = document.getElementById("prj_format").value;
   }
   if (summary === "" || summary === undefined) {
     summary = document.getElementById("dft_format").value;
@@ -122,22 +123,22 @@ function createEvent(r) {
   summary = summary.split("\\\\");
   for (var i=0; i<summary.length; i++) {
     var temp = summary[i];
-    temp = temp.replace(/([^\\]|^)%cc/g, "$1" + r.courseCode);
+    temp = temp.replace(/([^\\]|^)%cc/g, "$1" + rItem["Course Code"]);
     temp = temp.replace(/\\%cc/g, "%cc");
-    temp = temp.replace(/([^\\]|^)%cn/g, "$1" + r.courseName);
+    temp = temp.replace(/([^\\]|^)%cn/g, "$1" + rItem["Course Name"]);
     temp = temp.replace(/\\%cn/g, "%cn");
-    temp = temp.replace(/([^\\]|^)%comp/g, "$1" + r.component);
+    temp = temp.replace(/([^\\]|^)%comp/g, "$1" + rItem["Component"]);
     summary[i] = temp.replace(/\\%comp/g, "%comp");
   }
   summary = summary.join("\\");
 
   // Description
-  desc = "Class Nbr: " + r.classNumber;
-  desc += "\\nSection: " + r.section;
-  desc += "\\nInstructor: " + r.instructor;
+  desc = "Class Nbr: " + rItem["Class Nbr"];
+  desc += "\\nSection: " + rItem["Section"];
+  desc += "\\nInstructor: " + rItem["Instructor"];
 
   // Location
-  location = r.room.split(/\s+/).join(" ");
+  location = rItem["Room"].split(/\s+/).join(" ");
 
   // DTSTAMP
   // format is YYYMMDDThhmmssZ
@@ -145,20 +146,20 @@ function createEvent(r) {
   dtstamp = dtstamp.replace(/\.\d{3}/, "");
 
   // DTSTART and DTEND and RRULE
-  var seSplit = r.startEnd.replace(/ - /, '/').split('/');
+  var seSplit = rItem["Start/End Date"].replace(/ - /, '/').split('/');
   var startDate = seSplit[2] + seSplit[0] + seSplit[1];
   var endDate   = seSplit[5] + seSplit[3] + seSplit[4];
 
   var recurring = startDate !== endDate;
   if (recurring) {
     // Regular recurring component
-    var temp = createDtBounds(r.daysTimes, startDate, endDate);
-    rrule = createRRule(r.daysTimes, startDate, endDate);
+    var temp = createDtBounds(rItem["Days & Times"], startDate, endDate);
+    rrule = createRRule(rItem["Days & Times"], startDate, endDate);
     dtstart = temp[0];
     dtend = temp[1];
   } else {
     // Midterm or Seminar or Lab
-    var temp = createDtBounds(r.daysTimes, startDate, endDate);
+    var temp = createDtBounds(rItem["Days & Times"], startDate, endDate);
     dtstart = temp[0];
     dtend = temp[1];
   }
@@ -257,16 +258,16 @@ function createDtBounds(daysTimes, startDate, endDate) {
     var daysChar = daysTimes.match(/\w+/)[0].match(/[MTWF]h?/g);
     switch (daysChar[0]) {
       case "T":
-      startDate = (parseInt(startDate) + 1).toString();
-      break;
+        startDate = (parseInt(startDate) + 1).toString();
+        break;
       case "W":
-      startDate = (parseInt(startDate) + 2).toString();
-      break;
+        startDate = (parseInt(startDate) + 2).toString();
+        break;
       case "Th":
-      startDate = (parseInt(startDate) + 3).toString();
-      break;
+        startDate = (parseInt(startDate) + 3).toString();
+        break;
       case "F":
-      startDate = (parseInt(startDate) + 4).toString();
+        startDate = (parseInt(startDate) + 4).toString();
     }
   }
 
@@ -293,8 +294,8 @@ function createDtBounds(daysTimes, startDate, endDate) {
   
   var a = aData[1] + aData[2] + "00";
   for (var i=a.length; i<6; i++) a = "0" + a;
-    var b = bData[1] + bData[2] + "00";
+  var b = bData[1] + bData[2] + "00";
   for (var i=b.length; i<6; i++) b = "0" + b;
 
-    return [startDate+"T"+a, startDate+"T"+b];
+  return [startDate+"T"+a, startDate+"T"+b];
 }
