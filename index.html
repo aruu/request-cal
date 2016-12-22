@@ -16,7 +16,22 @@
 		<iframe height="500", width="800", src="https://quest.pecs.uwaterloo.ca/psp/SS/"></iframe>
 
 	TODO: have these only appear when component exists
-	-->
+-->
+<h1>Generate an .ics (iCAL) file from Quest</h1>
+<ol>
+	<li><h2>Copy your schedule from Quest</h2></li>
+	<ol type="a">
+		<li>Log into Quest at <a href="https://quest.pecs.uwaterloo.ca/psp/SS/">https://quest.pecs.uwaterloo.ca/psp/SS/</a></li>
+		<li>Click "Enroll"<br><img style="vertical-align:top" src="img/1b.png"></li>
+		<li>Select your term and press "Continue"<br><img style="vertical-align:top" src="img/1c.png"></li>
+		<li>Press Ctrl+A so that all the text is highlighted as such, and press Ctrl+C to copy<br><img style="vertical-align:top" src="img/1d.png"></li>
+	</ol>
+	<br>
+
+	<li><h2>Paste the text into this box:<h2></li>
+	<textarea id="quest_content" rows="10" cols="120"></textarea>
+
+	<li><h2>Adjust the text formatting or leave the defaults<h2></li>
 	<a href="javascript:toggle_message('lec_format')"  class="hide">Lecture label</a><br>
 	<a href="javascript:toggle_message('tut_format')"  class="hide">Tutorial label</a><br>
 	<a href="javascript:toggle_message('lab_format')"  class="hide">Lab label</a><br>
@@ -29,11 +44,13 @@
 	<textarea id="sem_format">%cc %cn</textarea>
 	<textarea id="prj_format">%cc - %cn</textarea>
 	<textarea id="dft_format">%cc %comp</textarea>
-	<textarea id="quest_content" rows="10" cols="120"></textarea>
-	<textarea id="ics_content" rows="10" cols="120"></textarea>
-	<br> Change given Quest input into an .ics file:
+
+	<li><h2>Generate the ICS file !<h2></li>
 	<button onclick="generateICS()">Generate ICS file</button>
+	<textarea id="ics_content" rows="10" cols="120" style="vertical-align:middle"></textarea>
+
+	<li><h2>Download !<h2></li>
 	<a id="download_a"><button id="download_btn" disabled>Download</button></a>
-	<br>
+</ol>
 </body>
 </html>
