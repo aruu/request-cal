@@ -23,7 +23,7 @@ function generateICS() {
   // Iterate through Quest text
   for (var i=0; i<input.length; i++) {
 
-    if (result = /(\w+ \d+\w*) - ([\w\-&\. ]+)/.exec(input[i])) {
+    if (result = /(\w+ \d+\w*) - (.+$)/.exec(input[i])) {
       var row = {};
       row["Course Code"] = result[1];
       row["Course Name"] = result[2];
@@ -52,7 +52,7 @@ function generateICS() {
   }
 
   // now we have the table information as they exist, with inferences
-  console.log(rows);
+  // console.log(rows);
   // could merge the biweekly lab events into a recurring event here
 
   for (var i=0; i<rows.length; i++) {
