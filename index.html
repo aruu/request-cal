@@ -1,33 +1,42 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<script src="calGen.js"></script>
-<script src="ui.js"></script>
-<link rel="stylesheet" type="text/css" href="request.css">
-<title>request-cal | aruu.github.io</title>
+	<script src="calGen.js"></script>
+	<script src="ui.js"></script>
+	<link rel="stylesheet" type="text/css" href="request.css">
+	<title>request-cal | aruu.github.io</title>
 </head>
 <body>
-<!-- TODO: have these only appear when component exists -->
-<a href="javascript:toggle_messege('lec_format')"  class="hide">Lecture label</a><br>
-<a href="javascript:toggle_messege('tut_format')"  class="hide">Tutorial label</a><br>
-<a href="javascript:toggle_messege('lab_format')"  class="hide">Lab label</a><br>
-<a href="javascript:toggle_messege('tst_format')"  class="hide">Test label</a><br>
-<a href="javascript:toggle_messege('sem_format')"  class="hide">Seminar label</a><br>
-<textarea id="lec_format">%cc - %cn</textarea>
-<textarea id="tut_format"></textarea>
-<textarea id="lab_format"></textarea>
-<textarea id="tst_format">%cc Midterm</textarea>
-<textarea id="sem_format">%cc %cn</textarea>
-<textarea id="prj_format">%cc - %cn</textarea>
-<textarea id="dft_format">%cc %comp</textarea>
-<textarea id="quest_content" rows="10" cols="120">
-</textarea>
-<br> Change given Quest input into an .ics file:
-<button onclick="generateICS()">
-	Convert
-</button>
-<br>
-<textarea id="ics_content" rows="10" cols="120">
-</textarea>
+	<!--
+	only way to get data personalized per student is through quest;
+		perhaps scrape class no. and use UW API for other info? https://github.com/uWaterloo/api-documentation#accessing-the-api
+		but since scheduling info is there anyways, just use for now, but API might be cleaner
+
+	have some way to scrape schedule data from an embedded iframe login?
+		<iframe height="500", width="800", src="https://quest.pecs.uwaterloo.ca/psp/SS/"></iframe>
+
+	TODO: have these only appear when component exists
+	-->
+	<a href="javascript:toggle_message('lec_format')"  class="hide">Lecture label</a><br>
+	<a href="javascript:toggle_message('tut_format')"  class="hide">Tutorial label</a><br>
+	<a href="javascript:toggle_message('lab_format')"  class="hide">Lab label</a><br>
+	<a href="javascript:toggle_message('tst_format')"  class="hide">Test label</a><br>
+	<a href="javascript:toggle_message('sem_format')"  class="hide">Seminar label</a><br>
+	<textarea id="lec_format">%cc - %cn</textarea>
+	<textarea id="tut_format"></textarea>
+	<textarea id="lab_format"></textarea>
+	<textarea id="tst_format">%cc Midterm</textarea>
+	<textarea id="sem_format">%cc %cn</textarea>
+	<textarea id="prj_format">%cc - %cn</textarea>
+	<textarea id="dft_format">%cc %comp</textarea>
+	<textarea id="quest_content" rows="10" cols="120">
+	</textarea>
+	<br> Change given Quest input into an .ics file:
+	<button onclick="generateICS()">
+		Convert
+	</button>
+	<br>
+	<textarea id="ics_content" rows="10" cols="120">
+	</textarea>
 </body>
 </html>

@@ -1,4 +1,4 @@
-function toggle_messege(id) {
+function toggle_message(id) {
   console.log(document.getElementById(id).style.display);
   if (document.getElementById(id).style.display == '') {
     document.getElementById(id).style.display = 'none';
