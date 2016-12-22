@@ -1,5 +1,7 @@
 # request-cal
 
+Import method inspired by https://github.com/vikstrous/Quest-Schedule-Exporter
+
 TODO:
 - [ ] include instructions on how to use
 - [ ] include instructions on how to add to Google cal
