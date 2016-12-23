@@ -29,7 +29,7 @@
 	<br>
 
 	<li><h2>Paste the text into this box:<h2></li>
-	<textarea id="quest_content" rows="10" cols="120"></textarea>
+	<textarea id="quest_content" rows="10" cols="120" oninput="generateICS()"></textarea>
 
 	<li><h2>Adjust the text formatting or leave the defaults<h2></li>
 	<a href="javascript:toggle_message('lec_format')"  class="hide">Lecture label</a><br>
@@ -45,8 +45,7 @@
 	<textarea id="prj_format">%cc - %cn</textarea>
 	<textarea id="dft_format">%cc %comp</textarea>
 
-	<li><h2>Generate the ICS file !<h2></li>
-	<button onclick="generateICS()">Generate ICS file</button>
+	<li><h2><del>Generate the ICS file !</del>Marvel at HTML5<h2></li>
 	<textarea id="ics_content" rows="10" cols="120" style="vertical-align:middle"></textarea>
 
 	<li><h2>Download !<h2></li>
