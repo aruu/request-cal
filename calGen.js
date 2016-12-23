@@ -54,6 +54,12 @@ function generateICS() {
   // now we have the table information as they exist, with inferences
   // console.log(rows);
   // could merge the biweekly lab events into a recurring event here
+  var components = new Set();
+  for (var i=0; i<rows.length; i++) {
+    components.add(rows[i]["Component"]);
+  }
+  console.log(components)
+
 
   for (var i=0; i<rows.length; i++) {
     console.log(rows[i]);
