@@ -58,11 +58,14 @@ function generateICS() {
   for (var i=0; i<rows.length; i++) {
     components.add(rows[i]["Component"]);
   }
-  console.log(components)
+  var compArray = Array.from(components.values()).join(", ");
+  var x = document.getElementById("asdf");
+  var t = document.createTextNode(compArray);
+  x.replaceChild(t, x.childNodes[0]);
 
 
   for (var i=0; i<rows.length; i++) {
-    console.log(rows[i]);
+    // console.log(rows[i]);
     if (rows[i]["Days & Times"] !== undefined && rows[i]["Days & Times"] !== "TBA" && rows[i]["Days & Times"] !== " ") {
       output += createEvent(rows[i]);
     }
