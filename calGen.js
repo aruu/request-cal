@@ -105,29 +105,17 @@ function readRow(prevRow, input, i, colNames) {
 function createEvent(rItem) {
 	var summary, desc, location, dtstamp, dtstart, dtend, rrule, uid;
 
+
+  // One of LEC, TUT, LAB, TST, SEM, PRJ, default is used
+  // LEC and TST are the ones for which I have different specifications; the rest can use default
   // Summary
-  switch (rItem["Component"]) {
-    case "LEC":
-      summary = document.getElementById("lec_format").value;
-      break;
-    case "TUT":
-      summary = document.getElementById("tut_format").value;
-      break;
-    case "LAB":
-      summary = document.getElementById("lab_format").value;
-      break;
-    case "TST":
-      summary = document.getElementById("tst_format").value;
-      break;
-    case "SEM":
-      summary = document.getElementById("sem_format").value;
-      break;
-    case "PRJ":
-      summary = document.getElementById("prj_format").value;
+  var formatStr = rItem["Component"].concat("_format");
+  summary = document.getElementById(formatStr);
+  if (summary === null || summary.value === "") { // Either no DOM element returned or the element is empty
+    summary = document.getElementById("default_format");
   }
-  if (summary === "" || summary === undefined) {
-    summary = document.getElementById("dft_format").value;
-  }
+  summary = summary.value;
+
   // Process substitutions
   summary = summary.split("\\\\");
   for (var i=0; i<summary.length; i++) {

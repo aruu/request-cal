@@ -29,25 +29,34 @@
 	<br>
 
 	<li><h2>Paste the text into this box:<h2></li>
-	<textarea id="quest_content" rows="10" cols="120" oninput="generateICS()"></textarea>
+	<textarea id="quest_content" rows="5" cols="120" oninput="generateICS()"></textarea>
 
 	<li><h2>Adjust the text formatting or leave the defaults<h2></li>
 	<p id="asdf">Components from input: </p>
-	<a href="javascript:toggle_message('lec_format')"  class="hide">Lecture label</a><br>
-	<a href="javascript:toggle_message('tut_format')"  class="hide">Tutorial label</a><br>
-	<a href="javascript:toggle_message('lab_format')"  class="hide">Lab label</a><br>
-	<a href="javascript:toggle_message('tst_format')"  class="hide">Test label</a><br>
-	<a href="javascript:toggle_message('sem_format')"  class="hide">Seminar label</a><br>
-	<textarea id="lec_format">%cc - %cn</textarea>
-	<textarea id="tut_format"></textarea>
-	<textarea id="lab_format"></textarea>
-	<textarea id="tst_format">%cc Midterm</textarea>
-	<textarea id="sem_format">%cc %cn</textarea>
-	<textarea id="prj_format">%cc - %cn</textarea>
-	<textarea id="dft_format">%cc %comp</textarea>
+	<!-- LEC, TUT, LAB, TST, SEM, PRJ, default -->
+	<table>
+		<tr>
+			<td>LEC format</td>
+			<td>TUT format</td>
+			<td>LAB format</td>
+			<td>TST format</td>
+			<td>SEM format</td>
+			<td>PRJ format</td>
+			<td>default format</td>
+		</tr>
+		<tr>
+			<td><input id="LEC_format" value="%cc - %cn"></td>
+			<td><input id="TUT_format"></td>
+			<td><input id="LAB_format"></td>
+			<td><input id="TST_format" value="%cc Midterm"></td>
+			<td><input id="SEM_format"></td>
+			<td><input id="PRJ_format"></td>
+			<td><input id="default_format" value="%cc %comp"></td>
+		</tr>
+	</table>
 
 	<li><h2><del>Generate the ICS file !</del>Marvel at HTML5<h2></li>
-	<textarea id="ics_content" rows="10" cols="120" style="vertical-align:middle"></textarea>
+	<textarea id="ics_content" rows="20" cols="120" style="vertical-align:middle" disabled></textarea>
 
 	<li><h2>Download !<h2></li>
 	<a id="download_a"><button id="download_btn" disabled>Download</button></a>
