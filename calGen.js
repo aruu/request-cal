@@ -63,6 +63,21 @@ function generateICS() {
   var t = document.createTextNode(compArray);
   x.replaceChild(t, x.childNodes[0]);
 
+  // Populate table
+  var formatTable = document.getElementById("format_table");
+  var itemStrs = Array.from(components.values()).map(function(x) x.concat("_format"));
+  for (var i=0; i<itemStrs.length; i++) {
+    var temp = document.createElement("td");
+    var temp2 = document.createTextNode(itemStrs[i]);
+    temp.appendChild(temp2);
+    formatTable.childNodes[1].childNodes[0].appendChild(temp);
+    temp = document.createElement("td");
+    temp2 = document.createElement("input");
+    temp2.id = itemStrs[i];
+    temp.appendChild(temp2);
+    formatTable.childNodes[1].childNodes[2].appendChild(temp);
+  }
+
 
   for (var i=0; i<rows.length; i++) {
     // console.log(rows[i]);
