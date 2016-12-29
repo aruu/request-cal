@@ -14,8 +14,6 @@
 
 	have some way to scrape schedule data from an embedded iframe login?
 		<iframe height="500", width="800", src="https://quest.pecs.uwaterloo.ca/psp/SS/"></iframe>
-
-	TODO: have these only appear when component exists
 -->
 <h1>Generate an .ics (iCAL) file from Quest</h1>
 <ol>
@@ -32,27 +30,9 @@
 	<textarea id="quest_content" rows="5" cols="120" oninput="generateICS()"></textarea>
 
 	<li><h2>Adjust the text formatting or leave the defaults<h2></li>
-	<p id="asdf">Components from input: </p>
-	<!-- LEC, TUT, LAB, TST, SEM, PRJ, default -->
 	<table id="format_table">
-		<tr>
-			<td>LEC format</td>
-			<td>TUT format</td>
-			<td>LAB format</td>
-			<td>TST format</td>
-			<td>SEM format</td>
-			<td>PRJ format</td>
-			<td>default format</td>
-		</tr>
-		<tr>
-			<td><input id="LEC_format" value="%cc - %cn"></td>
-			<td><input id="TUT_format"></td>
-			<td><input id="LAB_format"></td>
-			<td><input id="TST_format" value="%cc Midterm"></td>
-			<td><input id="SEM_format"></td>
-			<td><input id="PRJ_format"></td>
-			<td><input id="default_format" value="%cc %comp"></td>
-		</tr>
+		<tr></tr>
+		<tr></tr>
 	</table>
 
 	<li><h2><del>Generate the ICS file !</del>Marvel at HTML5<h2></li>

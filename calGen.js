@@ -58,26 +58,42 @@ function generateICS() {
   for (var i=0; i<rows.length; i++) {
     components.add(rows[i]["Component"]);
   }
-  var compArray = Array.from(components.values()).join(", ");
-  var x = document.getElementById("asdf");
-  var t = document.createTextNode(compArray);
-  x.replaceChild(t, x.childNodes[0]);
 
   // Populate table
   var formatTable = document.getElementById("format_table");
-  var itemStrs = Array.from(components.values()).map(function(x) x.concat("_format"));
+  console.log(formatTable.childNodes);
+  var itemStrs = Array.from(components.values());
   for (var i=0; i<itemStrs.length; i++) {
     var temp = document.createElement("td");
-    var temp2 = document.createTextNode(itemStrs[i]);
+    var temp2 = document.createTextNode(itemStrs[i].concat(" format"));
     temp.appendChild(temp2);
     formatTable.childNodes[1].childNodes[0].appendChild(temp);
     temp = document.createElement("td");
     temp2 = document.createElement("input");
-    temp2.id = itemStrs[i];
+    temp2.id = itemStrs[i].concat("_format");
     temp.appendChild(temp2);
     formatTable.childNodes[1].childNodes[2].appendChild(temp);
   }
 
+  // default entry in formatting table
+  var temp = document.createElement("td");
+  var temp2 = document.createTextNode("default format");
+  temp.appendChild(temp2);
+  formatTable.childNodes[1].childNodes[0].appendChild(temp);
+  temp = document.createElement("td");
+  temp2 = document.createElement("input");
+  temp2.id = "default_format";
+  temp.appendChild(temp2);
+  formatTable.childNodes[1].childNodes[2].appendChild(temp);
+
+  // One of LEC, TUT, LAB, TST, SEM, PRJ, default is used
+  // LEC and TST are the ones for which I have different specifications; the rest can use default
+  // pre-populate input box for LEC, TST, and default
+  temp = document.getElementById("LEC_format");
+  if (temp != null) temp.value = "%cc - %cn";
+  temp = document.getElementById("TST_format");
+  if (temp != null) temp.value = "%cc Midterm";
+  document.getElementById("default_format").value = "%cc %comp";
 
   for (var i=0; i<rows.length; i++) {
     // console.log(rows[i]);
@@ -126,7 +142,7 @@ function createEvent(rItem) {
   // Summary
   var formatStr = rItem["Component"].concat("_format");
   summary = document.getElementById(formatStr);
-  if (summary === null || summary.value === "") { // Either no DOM element returned or the element is empty
+  if (summary === null || summary.value === "") { // Either no DOM element returned or the field is empty
     summary = document.getElementById("default_format");
   }
   summary = summary.value;
