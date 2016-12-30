@@ -3,13 +3,6 @@ var uidCounter = 0;
 function generateICS() {
   var input = document.getElementById("quest_content").value;
 
-  var output = "";
-
-  // ICS file header
-  output += "BEGIN:VCALENDAR\n";
-  output += "VERSION:2.0\n";
-  output += "PRODID:-//Kevin Thai//reQuestCal 1.5//EN\n";
-
   var numEvents = 0;
 
   // Clean up input text
@@ -54,46 +47,19 @@ function generateICS() {
   // now we have the table information as they exist, with inferences
   // console.log(rows);
   // could merge the biweekly lab events into a recurring event here
-  var components = new Set();
-  for (var i=0; i<rows.length; i++) {
-    components.add(rows[i]["Component"]);
-  }
 
   // Populate table
   var formatTable = document.getElementById("format_table");
-  console.log(formatTable.childNodes);
-  var itemStrs = Array.from(components.values());
-  for (var i=0; i<itemStrs.length; i++) {
-    var temp = document.createElement("td");
-    var temp2 = document.createTextNode(itemStrs[i].concat(" format"));
-    temp.appendChild(temp2);
-    formatTable.childNodes[1].childNodes[0].appendChild(temp);
-    temp = document.createElement("td");
-    temp2 = document.createElement("input");
-    temp2.id = itemStrs[i].concat("_format");
-    temp.appendChild(temp2);
-    formatTable.childNodes[1].childNodes[2].appendChild(temp);
-  }
+  populateFormatTable(rows, formatTable);
 
-  // default entry in formatting table
-  var temp = document.createElement("td");
-  var temp2 = document.createTextNode("default format");
-  temp.appendChild(temp2);
-  formatTable.childNodes[1].childNodes[0].appendChild(temp);
-  temp = document.createElement("td");
-  temp2 = document.createElement("input");
-  temp2.id = "default_format";
-  temp.appendChild(temp2);
-  formatTable.childNodes[1].childNodes[2].appendChild(temp);
 
-  // One of LEC, TUT, LAB, TST, SEM, PRJ, default is used
-  // LEC and TST are the ones for which I have different specifications; the rest can use default
-  // pre-populate input box for LEC, TST, and default
-  temp = document.getElementById("LEC_format");
-  if (temp != null) temp.value = "%cc - %cn";
-  temp = document.getElementById("TST_format");
-  if (temp != null) temp.value = "%cc Midterm";
-  document.getElementById("default_format").value = "%cc %comp";
+
+
+  // ICS file header
+  var output = "";
+  output += "BEGIN:VCALENDAR\n";
+  output += "VERSION:2.0\n";
+  output += "PRODID:-//Kevin Thai//reQuestCal 1.5//EN\n";
 
   for (var i=0; i<rows.length; i++) {
     // console.log(rows[i]);
@@ -131,6 +97,44 @@ function readRow(prevRow, input, i, colNames) {
     row[colNames[j]] = input[i+j];
   }
   return row;
+}
+
+function populateFormatTable(rows, formatTable) {
+  // Determine set of components
+  var compSet = new Set();
+  for (var i=0; i<rows.length; i++) {
+    compSet.add(rows[i]["Component"]);
+  }
+  // default entry in formatting table
+  var compStrs = Array.from(compSet.values()).concat("default");
+
+  // Populate table
+  var tr0 = document.createElement("tr");
+  var tr1 = document.createElement("tr");
+  for (var i=0; i<compStrs.length; i++) {
+    var td = document.createElement("td");
+    var content = document.createTextNode(compStrs[i].concat(" format"));
+    td.appendChild(content);
+    tr0.appendChild(td);
+
+    td = document.createElement("td");
+    content = document.createElement("input");
+    content.id = compStrs[i].concat("_format");
+    td.appendChild(content);
+    tr1.appendChild(td);
+  }
+  formatTable.replaceChild(tr0, formatTable.childNodes[0]);
+  formatTable.replaceChild(tr1, formatTable.childNodes[1]);
+
+  // Components I've seen include LEC, TUT, LAB, TST, SEM, PRJ
+  // LEC and TST are the ones for which I have different specifications; the rest can use default
+  // Pre-populate input box for LEC, TST, and default
+  var inputField;
+  inputField = document.getElementById("LEC_format");
+  if (inputField != null) inputField.value = "%cc - %cn";
+  inputField = document.getElementById("TST_format");
+  if (inputField != null) inputField.value = "%cc Midterm";
+  document.getElementById("default_format").value = "%cc %comp";
 }
 
 function createEvent(rItem) {
