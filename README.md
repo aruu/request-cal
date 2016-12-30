@@ -1,4 +1,4 @@
-# request-cal (aruu.github.io/request-cal)
+# request-cal (https://aruu.github.io/request-cal)
 
 Import method inspired by https://github.com/vikstrous/Quest-Schedule-Exporter
 
