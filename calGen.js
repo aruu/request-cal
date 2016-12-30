@@ -1,48 +1,10 @@
 var uidCounter = 0;
 
-function generateICS() {
+function main() {
   var input = document.getElementById("quest_content").value;
 
-  var numEvents = 0;
-
-  // Clean up input text
-  input = input.split("\n");
-  for (var i=input.length-1; i>=0; i--) {
-    if (/^\t*$/.exec(input[i])) input.splice(i,1);
-  }
-
-  var rows = [];
-
-  // Iterate through Quest text
-  for (var i=0; i<input.length; i++) {
-
-    if (result = /(\w+ \d+\w*) - (.+$)/.exec(input[i])) {
-      var row = {};
-      row["Course Code"] = result[1];
-      row["Course Name"] = result[2];
-      i++;
-
-      // Skip n lines; this corresponds to the first table, Course Info
-      i += input[i].split("\t").length + 1;
-
-      // Get column headings
-      var colNames = input[i].split("\t");
-      // Trim the headings for trailing spaces
-      for (var j=0; j<colNames.length; j++) colNames[j] = colNames[j].trim();
-      i++;
-
-      // Start of component data
-      // Entries in each row
-      while (input[i] !== "Exam Information") {
-        numEvents++;
-        row = readRow(row, input, i, colNames);
-        rows.push(row);
-        i += colNames.length;
-      }
-
-    }
-
-  }
+  // Parse text
+  var rows = parseText(input);
 
   // now we have the table information as they exist, with inferences
   // console.log(rows);
@@ -51,9 +13,6 @@ function generateICS() {
   // Populate table
   var formatTable = document.getElementById("format_table");
   populateFormatTable(rows, formatTable);
-
-
-
 
   // ICS file header
   var output = "";
@@ -80,8 +39,46 @@ function generateICS() {
   aasdf.download = "asdf.ics";
   var aasdf = document.getElementById("download_btn");
   aasdf.removeAttribute("disabled");
+}
 
-  var info = "The total number of events created was " + numEvents + ".";
+function parseText(input) {
+  // Clean up input text
+  input = input.split("\n");
+  for (var i=input.length-1; i>=0; i--) {
+    if (/^\t*$/.exec(input[i])) input.splice(i,1);
+  }
+
+  // Iterate through Quest text
+  var rows = [];
+  for (var i=0; i<input.length; i++) {
+
+    if (result = /(\w+ \d+\w*) - (.+$)/.exec(input[i])) {
+      var row = {};
+      row["Course Code"] = result[1];
+      row["Course Name"] = result[2];
+      i++;
+
+      // Skip n lines; this corresponds to the first table, Course Info
+      i += input[i].split("\t").length + 1;
+
+      // Get column headings
+      var colNames = input[i].split("\t");
+      // Trim the headings for trailing spaces
+      for (var j=0; j<colNames.length; j++) colNames[j] = colNames[j].trim();
+      i++;
+
+      // Distinguish between add'l row in table and end of table (start of Exam Information section)
+      while (input[i] !== "Exam Information") {
+        row = readRow(row, input, i, colNames);
+        rows.push(row);
+        i += colNames.length;
+      }
+
+    }
+
+  }
+
+  return rows;
 }
 
 // Produce a struct with fields named with column headers
