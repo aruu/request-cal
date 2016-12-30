@@ -128,9 +128,9 @@ function populateFormatTable(rows, formatTable) {
   // Pre-populate input box for LEC, TST, and default
   var inputField;
   inputField = document.getElementById("LEC_format");
-  if (inputField != null) inputField.value = "%cc - %cn";
+  if (inputField !== null) inputField.value = "%cc - %cn";
   inputField = document.getElementById("TST_format");
-  if (inputField != null) inputField.value = "%cc Midterm";
+  if (inputField !== null) inputField.value = "%cc Midterm";
   document.getElementById("default_format").value = "%cc %comp";
 }
 
