@@ -177,18 +177,19 @@ function createEvent(rItem) {
   // DTSTART and DTEND and RRULE
   var seSplit = rItem["Start/End Date"].replace(/ - /, '/').split('/');
   var startDate = seSplit[2] + seSplit[0] + seSplit[1];
+  var dayOfWeek = new Date(seSplit[2], seSplit[0]-1, seSplit[1]).getDay();
   var endDate   = seSplit[5] + seSplit[3] + seSplit[4];
 
   var recurring = startDate !== endDate;
   if (recurring) {
     // Regular recurring component
-    var temp = createDtBounds(rItem["Days & Times"], startDate, endDate);
     rrule = createRRule(rItem["Days & Times"], startDate, endDate);
+    var temp = createDtBounds(rItem["Days & Times"], startDate, endDate, dayOfWeek, rrule);
     dtstart = temp[0];
     dtend = temp[1];
   } else {
     // Midterm or Seminar or Lab
-    var temp = createDtBounds(rItem["Days & Times"], startDate, endDate);
+    var temp = createDtBounds(rItem["Days & Times"], startDate, endDate, dayOfWeek, rrule);
     dtstart = temp[0];
     dtend = temp[1];
   }
@@ -281,23 +282,21 @@ function createRRule(daysTimes, startDate, endDate) {
   return rrule.replace(/.$/,"");
 }
 
-function createDtBounds(daysTimes, startDate, endDate) {
+function createDtBounds(daysTimes, startDate, endDate, dayOfWeek, rrule) {
 
   if (startDate !== endDate) {
-    var daysChar = daysTimes.match(/\w+/)[0].match(/[MTWF]h?/g);
-    switch (daysChar[0]) {
-      case "T":
-        startDate = (parseInt(startDate) + 1).toString();
-        break;
-      case "W":
-        startDate = (parseInt(startDate) + 2).toString();
-        break;
-      case "Th":
-        startDate = (parseInt(startDate) + 3).toString();
-        break;
-      case "F":
-        startDate = (parseInt(startDate) + 4).toString();
-    }
+    // this is so utterly messy. rewrite how rrules are calculated
+    var days = [0,0,0,0,0,0,0];
+    if (rrule.match(/BYDAY=.*/)[0].match(/MO/)) days[1] = 1;
+    if (rrule.match(/BYDAY=.*/)[0].match(/TU/)) days[2] = 1;
+    if (rrule.match(/BYDAY=.*/)[0].match(/WE/)) days[3] = 1;
+    if (rrule.match(/BYDAY=.*/)[0].match(/TH/)) days[4] = 1;
+    if (rrule.match(/BYDAY=.*/)[0].match(/FR/)) days[5] = 1;
+
+    var offset = 0;
+    // increment the start date until it's a valid date.
+    while (!days[(dayOfWeek+offset)%7]) offset++;
+    startDate = (parseInt(startDate) + offset).toString();
   }
 
   var pattern = /(\d+):(\d+)(\w+)/g;
