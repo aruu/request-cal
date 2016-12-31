@@ -1,10 +1,64 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<script src="calGen.js"></script>
-	<script src="ui.js"></script>
+	<link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.min.css">
 	<link rel="stylesheet" type="text/css" href="request.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.min.js"></script>
+	<script src="calGen.js"></script>
 	<title>request-cal | aruu.github.io</title>
+	<script>
+	$(document).ready(function() {
+
+	    // page is now ready, initialize the calendar...
+
+	    $('#calendar').fullCalendar({
+	    	defaultView: 'agendaWeek',
+			defaultDate: '2014-06-12',
+	    	events: [
+				{
+					title: 'All Day Event',
+					start: '2014-06-01'
+				},
+				{
+					title: 'Long Event',
+					start: '2014-06-07',
+					end: '2014-06-10'
+				},
+				{
+					id: 999,
+					title: 'Repeating Event',
+					start: '2014-06-09T16:00:00'
+				},
+				{
+					id: 999,
+					title: 'Repeating Event',
+					start: '2014-06-16T16:00:00'
+				},
+				{
+					title: 'Meeting',
+					start: '2014-06-12T10:30:00',
+					end: '2014-06-12T12:30:00'
+				},
+				{
+					title: 'Lunch',
+					start: '2014-06-12T12:00:00'
+				},
+				{
+					title: 'Birthday Party',
+					start: '2014-06-13T07:00:00'
+				},
+				{
+					title: 'Click for Google',
+					url: 'http://google.com/',
+					start: '2014-06-28'
+				}
+			]
+	    })
+
+	});
+	</script>
 </head>
 <body>
 	<!--
@@ -39,6 +93,8 @@
 
 	<li><h2>Download !<h2></li>
 	<a id="download_a"><button id="download_btn" disabled>Download</button></a>
+	<br>
+	<div id='calendar' style='width: 900px;margin: 0 auto;font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;'></div>
 </ol>
 </body>
 </html>
