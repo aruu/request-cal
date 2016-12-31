@@ -30,8 +30,26 @@ function main() {
   // End ICS file
   output += "END:VCALENDAR\n";
 
-  document.getElementById("ics_content").value = output;
 
+  // Output for FullCalendar
+  // dude this problem is annoying because ICS support is lacking ><
+  // maybe use ical.js from mozilla later on
+  document.getElementById("ics_content").value = output;
+  var events = [];
+  var icsEvents = output.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g);
+  for (var i=0; i<icsEvents.length; i++) {
+    var temp = {
+      title: icsEvents[i].match(/SUMMARY:(.*)/)[1],
+      start: icsEvents[i].match(/DTSTART;TZID=America\/Toronto:(.*)/)[1],
+      end: icsEvents[i].match(/DTEND;TZID=America\/Toronto:(.*)/)[1]
+    }
+    events.push(temp);
+  }
+  console.log(events);
+  $('#calendar').fullCalendar('removeEvents');
+  $('#calendar').fullCalendar('addEventSource', events);
+
+  document.getElementById("ics_content").value = output;
   // Exporting to file?
   var aasdf = document.getElementById("download_a");
   var file = new Blob([output], {type: 'data:text/ics;charset=utf-8'});

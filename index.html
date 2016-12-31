@@ -6,58 +6,22 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.2.2/ical.min.js"></script>
+	<script src="https://2733.github.io/icalendar2fullcalendar/ical_events.js"></script>
+	<script src="https://2733.github.io/icalendar2fullcalendar/ical_fullcalendar.js"></script>
 	<script src="calGen.js"></script>
 	<title>request-cal | aruu.github.io</title>
 	<script>
 	$(document).ready(function() {
-
-	    // page is now ready, initialize the calendar...
-
-	    $('#calendar').fullCalendar({
-	    	defaultView: 'agendaWeek',
-			defaultDate: '2014-06-12',
-	    	events: [
-				{
-					title: 'All Day Event',
-					start: '2014-06-01'
-				},
-				{
-					title: 'Long Event',
-					start: '2014-06-07',
-					end: '2014-06-10'
-				},
-				{
-					id: 999,
-					title: 'Repeating Event',
-					start: '2014-06-09T16:00:00'
-				},
-				{
-					id: 999,
-					title: 'Repeating Event',
-					start: '2014-06-16T16:00:00'
-				},
-				{
-					title: 'Meeting',
-					start: '2014-06-12T10:30:00',
-					end: '2014-06-12T12:30:00'
-				},
-				{
-					title: 'Lunch',
-					start: '2014-06-12T12:00:00'
-				},
-				{
-					title: 'Birthday Party',
-					start: '2014-06-13T07:00:00'
-				},
-				{
-					title: 'Click for Google',
-					url: 'http://google.com/',
-					start: '2014-06-28'
-				}
-			]
-	    })
-
-	});
+		$('#calendar').fullCalendar({
+			contentHeight: 822,
+			defaultView: 'agendaWeek',
+			// defaultDate: '2014-06-12',
+			allDaySlot: false,
+			minTime: "7:00:00",
+			maxTime: "23:00:00"
+		})
+	})
 	</script>
 </head>
 <body>
