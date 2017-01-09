@@ -38,14 +38,34 @@ function main() {
   var events = [];
   var icsEvents = output.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g);
   for (var i=0; i<icsEvents.length; i++) {
+    var title = icsEvents[i].match(/SUMMARY:(.*)/)[1];
+    var start = icsEvents[i].match(/DTSTART;TZID=America\/Toronto:(.*)/)[1];
+    var end = icsEvents[i].match(/DTEND;TZID=America\/Toronto:(.*)/)[1];
+    var rrule = icsEvents[i].match(/RRULE:(.*)/);
     var temp = {
-      title: icsEvents[i].match(/SUMMARY:(.*)/)[1],
-      start: icsEvents[i].match(/DTSTART;TZID=America\/Toronto:(.*)/)[1],
-      end: icsEvents[i].match(/DTEND;TZID=America\/Toronto:(.*)/)[1]
+      title: title,
+      start: start,
+      end: end
     }
-    events.push(temp);
+    if (rrule === null) {
+      events.push(temp);
+    } else {
+      var utcStart = moment.tz(start, "America/Toronto").toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      var rStarts = "RRULE:".concat(rrule[1]).concat(";DTSTART=").concat(utcStart);
+      rStarts = rrulestr(rStarts).all();
+      var utcEnd = moment.tz(end, "America/Toronto").toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      var rEnds = "RRULE:".concat(rrule[1]).concat(";DTSTART=").concat(utcEnd);
+      rEnds = rrulestr(rEnds).all();
+      for (var j=0; j<rStarts.length; j++) {
+        var temp2 = {
+          title: temp.title,
+          start: rStarts[j],
+          end: rEnds[j]
+        }
+        events.push(temp2);
+      }
+    }
   }
-  console.log(events);
   $('#calendar').fullCalendar('removeEvents');
   $('#calendar').fullCalendar('addEventSource', events);
 
@@ -189,8 +209,7 @@ function createEvent(rItem) {
 
   // DTSTAMP
   // format is YYYMMDDThhmmssZ
-  dtstamp = new Date().toISOString().replace(/[-:]/g, "");
-  dtstamp = dtstamp.replace(/\.\d{3}/, "");
+  dtstamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
   // DTSTART and DTEND and RRULE
   var seSplit = rItem["Start/End Date"].replace(/ - /, '/').split('/');
