@@ -106,12 +106,16 @@ function parseText(input) {
       i++;
 
       // Distinguish between add'l row in table and end of table (start of Exam Information section)
-      while (input[i] !== "Exam Information") {
+      while (true) {
         row = readRow(row, input, i, colNames);
         rows.push(row);
         i += colNames.length;
+        if (input[i] === "Exam Information") i++;
+        console.log(input[i]);
+        if (!/\d{4}/.exec(input[i])) break;
       }
-
+      i--;
+      
     }
 
   }
