@@ -111,11 +111,11 @@ function parseText(input) {
         rows.push(row);
         i += colNames.length;
         if (input[i] === "Exam Information") i++;
-        console.log(input[i]);
+        if (/\d{4}/.exec(input[i+1])) i++;
         if (!/\d{4}/.exec(input[i])) break;
       }
       i--;
-      
+
     }
 
   }
@@ -131,9 +131,16 @@ function readRow(prevRow, input, i, colNames) {
     
   // we've already stripped out all lines that are just tab;
   // every other space should be an empty cell
-  for (var j=0; j<colNames.length; j++) {
-    if (input[i+j].match(/^[\t\s]*$/)) continue;
-    row[colNames[j]] = input[i+j];
+  var n = colNames.length;
+  var m = 0;
+  for (var j=0; j<n; j++) {
+    row[colNames[m]] = input[i+j];
+    if (input[i+j].match(/,\s$/)) {
+    row[colNames[m]] = input[i+j] + input[i+j+1];
+      j++;
+      n++;
+    }
+    m++;
   }
   return row;
 }
