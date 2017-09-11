@@ -111,8 +111,8 @@ function parseText(input) {
         rows.push(row);
         i += colNames.length;
         if (input[i] === "Exam Information") i++;
-        if (/\d{4}/.exec(input[i+1])) i++;
-        if (!/\d{4}/.exec(input[i])) break;
+        if (/^\d{4}$/.exec(input[i+1])) i++;
+        if (!/^\d{4}$/.exec(input[i])) break;
       }
       i--;
 
@@ -134,6 +134,10 @@ function readRow(prevRow, input, i, colNames) {
   var n = colNames.length;
   var m = 0;
   for (var j=0; j<n; j++) {
+    console.log(i,j);
+    // an empty cell implies carry the same data over as previous entry
+    if (input[i+j].match(/^[\t\s]*$/)) continue;
+    // otherwise just assign take the data and assign it to this field
     row[colNames[m]] = input[i+j];
     if (input[i+j].match(/,\s$/)) {
     row[colNames[m]] = input[i+j] + input[i+j+1];
@@ -142,6 +146,7 @@ function readRow(prevRow, input, i, colNames) {
     }
     m++;
   }
+  console.log(row);
   return row;
 }
 
@@ -224,9 +229,16 @@ function createEvent(rItem) {
 
   // DTSTART and DTEND and RRULE
   var seSplit = rItem["Start/End Date"].replace(/ - /, '/').split('/');
-  var startDate = seSplit[2] + seSplit[0] + seSplit[1];
-  var dayOfWeek = new Date(seSplit[2], seSplit[0]-1, seSplit[1]).getDay();
-  var endDate   = seSplit[5] + seSplit[3] + seSplit[4];
+  // Two different possible date orders
+  if (seSplit[0].match(/\d{4}/)) {
+    var startDate = seSplit[0] + seSplit[1] + seSplit[2];
+    var dayOfWeek = new Date(seSplit[0], seSplit[1]-1, seSplit[2]).getDay();
+    var endDate   = seSplit[3] + seSplit[4] + seSplit[5];
+  } else {
+    var startDate = seSplit[2] + seSplit[0] + seSplit[1];
+    var dayOfWeek = new Date(seSplit[2], seSplit[0]-1, seSplit[1]).getDay();
+    var endDate   = seSplit[5] + seSplit[3] + seSplit[4];
+  }
 
   var recurring = startDate !== endDate;
   if (recurring) {
